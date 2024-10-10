@@ -2,7 +2,6 @@
 #![no_main]
 #![feature(type_alias_impl_trait)]
 
-
 mod hd108;
 use crate::hd108::HD108;
 use embassy_executor::Spawner;
@@ -36,7 +35,6 @@ enum Message {
 
 static SIGNAL_CHANNEL: StaticCell<Channel<NoopRawMutex, Message, 1>> = StaticCell::new();
 
-
 #[embassy_executor::task]
 async fn button_task(
     mut button_pin: Input<'static, GpioPin<10>>,
@@ -47,20 +45,18 @@ async fn button_task(
         button_pin.wait_for_falling_edge().await;
         sender.send(Message::ButtonPressed).await;
         Timer::after(Duration::from_millis(400)).await; // Debounce delay
-
     }
 }
-
 
 #[embassy_executor::task]
 async fn led_task(
     mut hd108: HD108<impl SpiBus<u8> + 'static>,
     receiver: Receiver<'static, NoopRawMutex, Message, 1>,
 ) {
-    let led_count = 97;  // Total number of LEDs
-    let mut yellow_pos = 0;  // Start position for yellow LED (Pacguy)
-    let mut red_pos_1 = 50;  // Start position for first red LED (ghost 1)
-    let mut red_pos_2 = 70;  // Start position for second red LED (ghost 2)
+    let led_count = 97; // Total number of LEDs
+    let mut yellow_pos = 0; // Start position for yellow LED (Pacguy)
+    let mut red_pos_1 = 50; // Start position for first red LED (ghost 1)
+    let mut red_pos_2 = 70; // Start position for second red LED (ghost 2)
     let mut blue_pos_1 = 20; // Start position for first blue LED (ghost 1)
     let mut blue_pos_2 = 40; // Start position for second blue LED (ghost 2)
     let mut iteration_count = 0;
@@ -123,15 +119,12 @@ async fn led_task(
     }
 
     println!("Pacguy animation complete...");
-    
+
     // Set all leds off
     hd108.set_off().await.unwrap();
 
-    loop {
-       
-    }
+    loop {}
 }
-
 
 #[main]
 async fn main(spawner: Spawner) {
@@ -150,7 +143,6 @@ async fn main(spawner: Spawner) {
     let miso = io.pins.gpio8;
     let mosi = io.pins.gpio7;
     let cs = io.pins.gpio9;
-
 
     let dma = Dma::new(peripherals.DMA);
 

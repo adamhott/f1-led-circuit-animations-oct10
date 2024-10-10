@@ -3,7 +3,6 @@
 #![feature(type_alias_impl_trait)]
 
 mod hd108;
-use hd108::HD108;
 use embassy_executor::Spawner;
 use embassy_sync::blocking_mutex::raw::NoopRawMutex;
 use embassy_sync::channel::Channel;
@@ -25,6 +24,7 @@ use esp_hal::{
     timer::timg::TimerGroup,
 };
 use esp_println::println;
+use hd108::HD108;
 use heapless08::Vec;
 use panic_halt as _;
 use static_cell::StaticCell;
@@ -34,7 +34,6 @@ enum Message {
 }
 
 static SIGNAL_CHANNEL: StaticCell<Channel<NoopRawMutex, Message, 1>> = StaticCell::new();
-
 
 #[embassy_executor::task]
 async fn button_task(
@@ -46,10 +45,8 @@ async fn button_task(
         button_pin.wait_for_falling_edge().await;
         sender.send(Message::ButtonPressed).await;
         Timer::after(Duration::from_millis(400)).await; // Debounce delay
-
     }
 }
-
 
 #[embassy_executor::task]
 async fn led_task(
@@ -123,16 +120,13 @@ async fn led_task(
         iteration_count += 1;
     }
 
-    println!("Bounce animation complete...");
+    println!("Forward reverse animation complete...");
 
     // Set all leds off
     hd108.set_off().await.unwrap();
 
-    loop {
-       
-    }
+    loop {}
 }
-
 
 #[main]
 async fn main(spawner: Spawner) {
@@ -151,7 +145,6 @@ async fn main(spawner: Spawner) {
     let miso = io.pins.gpio8;
     let mosi = io.pins.gpio7;
     let cs = io.pins.gpio9;
-
 
     let dma = Dma::new(peripherals.DMA);
 

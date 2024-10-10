@@ -2,7 +2,6 @@
 #![no_main]
 #![feature(type_alias_impl_trait)]
 
-
 mod hd108;
 use crate::hd108::HD108;
 use embassy_executor::Spawner;
@@ -36,7 +35,6 @@ enum Message {
 
 static SIGNAL_CHANNEL: StaticCell<Channel<NoopRawMutex, Message, 1>> = StaticCell::new();
 
-
 #[embassy_executor::task]
 async fn button_task(
     mut button_pin: Input<'static, GpioPin<10>>,
@@ -47,18 +45,22 @@ async fn button_task(
         button_pin.wait_for_falling_edge().await;
         sender.send(Message::ButtonPressed).await;
         Timer::after(Duration::from_millis(400)).await; // Debounce delay
-
     }
 }
-
 
 #[embassy_executor::task]
 async fn led_task(
     mut hd108: HD108<impl SpiBus<u8> + 'static>,
     receiver: Receiver<'static, NoopRawMutex, Message, 1>,
 ) {
-    let led_count = 97;  // Total number of LEDs (update if needed)
-    let wave_leds = [41,42,43,43,44,45,46,47,48,49,50, 68,67, 69, 66,31,30,29,28,27,26,25,70,65,64,63,62,61,24,71,23,72,22,21,72,73,20,74,19,75,18,76,17,77,16,78,4, 15,79,3,5,14,80,2,6, 13,81,82,1,7,12,83,96,8,12,11,84,95,9,10,85,94,93,92,91,90,89,88,87,86]; // Insert the full list of designators in the desired wave order
+    let led_count = 97; // Total number of LEDs (update if needed)
+    let wave_leds = [
+        32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53,
+        54, 55, 56, 57, 58, 59, 60, 68, 67, 69, 66, 31, 30, 29, 28, 27, 26, 25, 70, 65, 64, 63, 62,
+        61, 24, 71, 23, 72, 22, 21, 72, 73, 20, 74, 19, 75, 18, 76, 17, 77, 16, 78, 4, 15, 79, 3,
+        5, 14, 80, 2, 6, 13, 81, 82, 1, 7, 12, 83, 96, 8, 12, 11, 84, 95, 9, 10, 85, 94, 93, 92,
+        91, 90, 89, 88, 87, 86,
+    ]; // Insert the full list of designators in the desired wave order
 
     let mut iteration_count = 0;
 
@@ -89,11 +91,8 @@ async fn led_task(
     // Set all leds off
     hd108.set_off().await.unwrap();
 
-    loop {
-       
-    }
+    loop {}
 }
-
 
 #[main]
 async fn main(spawner: Spawner) {
@@ -112,7 +111,6 @@ async fn main(spawner: Spawner) {
     let miso = io.pins.gpio8;
     let mosi = io.pins.gpio7;
     let cs = io.pins.gpio9;
-
 
     let dma = Dma::new(peripherals.DMA);
 

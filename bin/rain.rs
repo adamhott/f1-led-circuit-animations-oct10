@@ -2,7 +2,6 @@
 #![no_main]
 #![feature(type_alias_impl_trait)]
 
-
 mod hd108;
 use crate::hd108::HD108;
 use embassy_executor::Spawner;
@@ -36,7 +35,6 @@ enum Message {
 
 static SIGNAL_CHANNEL: StaticCell<Channel<NoopRawMutex, Message, 1>> = StaticCell::new();
 
-
 #[embassy_executor::task]
 async fn button_task(
     mut button_pin: Input<'static, GpioPin<10>>,
@@ -47,18 +45,16 @@ async fn button_task(
         button_pin.wait_for_falling_edge().await;
         sender.send(Message::ButtonPressed).await;
         Timer::after(Duration::from_millis(400)).await; // Debounce delay
-
     }
 }
-
 
 #[embassy_executor::task]
 async fn led_task(
     mut hd108: HD108<impl SpiBus<u8> + 'static>,
     receiver: Receiver<'static, NoopRawMutex, Message, 1>,
 ) {
-    let led_count = 97;          // Total number of LEDs
-    let group_size = 5;          // Each group will contain 5 LEDs
+    let led_count = 97; // Total number of LEDs
+    let group_size = 5; // Each group will contain 5 LEDs
     let num_groups = led_count / group_size; // Number of groups
     let max_drops_per_group = 2; // Maximum number of raindrops per group
 
@@ -86,8 +82,8 @@ async fn led_task(
 
         // Update and move existing raindrops in each group
         for group_idx in 0..num_groups {
-            let group_start = group_idx * group_size;  // Start index of the group
-            let group_end = group_start + group_size;  // End index of the group
+            let group_start = group_idx * group_size; // Start index of the group
+            let group_end = group_start + group_size; // End index of the group
 
             for drop in &mut raindrops[group_idx] {
                 if let Some((pos, r, g, b)) = drop {
@@ -111,10 +107,11 @@ async fn led_task(
 
             // Randomly spawn new raindrops at the top of each group
             for drop in &mut raindrops[group_idx] {
-                if drop.is_none() && iteration_count % 10 == 0 { // Control the spawn rate
+                if drop.is_none() && iteration_count % 10 == 0 {
+                    // Control the spawn rate
                     // Create a new raindrop at position 0 within the group
                     *drop = Some((
-                        0,             // Position at the top of the group
+                        0, // Position at the top of the group
                         255, 255, 255, // Bright white raindrop
                     ));
                     break; // Limit one raindrop per group per frame
@@ -134,11 +131,8 @@ async fn led_task(
     // Set all leds off
     hd108.set_off().await.unwrap();
 
-    loop {
-       
-    }
+    loop {}
 }
-
 
 #[main]
 async fn main(spawner: Spawner) {
@@ -157,7 +151,6 @@ async fn main(spawner: Spawner) {
     let miso = io.pins.gpio8;
     let mosi = io.pins.gpio7;
     let cs = io.pins.gpio9;
-
 
     let dma = Dma::new(peripherals.DMA);
 

@@ -2,7 +2,6 @@
 #![no_main]
 #![feature(type_alias_impl_trait)]
 
-
 mod hd108;
 use crate::hd108::HD108;
 use embassy_executor::Spawner;
@@ -36,7 +35,6 @@ enum Message {
 
 static SIGNAL_CHANNEL: StaticCell<Channel<NoopRawMutex, Message, 1>> = StaticCell::new();
 
-
 #[embassy_executor::task]
 async fn button_task(
     mut button_pin: Input<'static, GpioPin<10>>,
@@ -47,10 +45,8 @@ async fn button_task(
         button_pin.wait_for_falling_edge().await;
         sender.send(Message::ButtonPressed).await;
         Timer::after(Duration::from_millis(400)).await; // Debounce delay
-
     }
 }
-
 
 #[embassy_executor::task]
 async fn led_task(
@@ -64,12 +60,12 @@ async fn led_task(
 
     // Predefined colors (red, green, blue values)
     let colors = [
-        (255, 0, 0),   // Red
-        (0, 255, 0),   // Green
-        (0, 0, 255),   // Blue
-        (255, 255, 0), // Yellow
-        (0, 255, 255), // Cyan
-        (255, 0, 255), // Magenta
+        (255, 0, 0),     // Red
+        (0, 255, 0),     // Green
+        (0, 0, 255),     // Blue
+        (255, 255, 0),   // Yellow
+        (0, 255, 255),   // Cyan
+        (255, 0, 255),   // Magenta
         (255, 255, 255), // White
     ];
 
@@ -105,11 +101,8 @@ async fn led_task(
     // Set all leds off
     hd108.set_off().await.unwrap();
 
-    loop {
-       
-    }
+    loop {}
 }
-
 
 #[main]
 async fn main(spawner: Spawner) {
@@ -128,7 +121,6 @@ async fn main(spawner: Spawner) {
     let miso = io.pins.gpio8;
     let mosi = io.pins.gpio7;
     let cs = io.pins.gpio9;
-
 
     let dma = Dma::new(peripherals.DMA);
 
