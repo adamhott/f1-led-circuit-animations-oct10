@@ -59,8 +59,10 @@ async fn led_task(
 ) {
     let led_count = 97;  // Total number of LEDs
     let mut yellow_pos = 0;  // Start position for yellow LED (Pacguy)
-    let mut red_pos = 50;    // Start position for red LED (ghost)
-    let mut blue_pos = 20;   // Start position for blue LED (ghost)
+    let mut red_pos_1 = 50;  // Start position for first red LED (ghost 1)
+    let mut red_pos_2 = 70;  // Start position for second red LED (ghost 2)
+    let mut blue_pos_1 = 20; // Start position for first blue LED (ghost 1)
+    let mut blue_pos_2 = 40; // Start position for second blue LED (ghost 2)
     let mut iteration_count = 0;
 
     while iteration_count < 1000 {
@@ -71,29 +73,47 @@ async fn led_task(
             led_updates.push((i, 0, 0, 0)).unwrap();
         }
 
-        // Yellow LED moves forward one step (Pacguy)
+        // Yellow LED (Pacguy) moves forward one step
         yellow_pos = (yellow_pos + 1) % led_count;
 
-        // Blue LED follows the yellow LED by staying 5 positions behind
-        blue_pos = if yellow_pos >= 5 {
+        // First Blue LED follows the yellow LED, staying 5 positions behind
+        blue_pos_1 = if yellow_pos >= 5 {
             yellow_pos - 5
         } else {
             led_count + yellow_pos - 5
         };
 
-        // Red LED jumps to a random position every 20 iterations
+        // Second Blue LED follows the yellow LED, staying 10 positions behind
+        blue_pos_2 = if yellow_pos >= 10 {
+            yellow_pos - 10
+        } else {
+            led_count + yellow_pos - 10
+        };
+
+        // First Red LED jumps to a random position every 20 iterations
         if iteration_count % 20 == 0 {
-            red_pos = (red_pos + 30) % led_count; // This simulates a "jump" across the track
+            red_pos_1 = (red_pos_1 + 30) % led_count; // Simulate a "jump" across the track
         }
 
-        // Set the yellow LED (Pacman)
+        // Second Red LED jumps to a random position every 30 iterations
+        if iteration_count % 30 == 0 {
+            red_pos_2 = (red_pos_2 + 40) % led_count; // Simulate a "jump" across the track
+        }
+
+        // Set the Yellow LED (Pacguy)
         led_updates[yellow_pos] = (yellow_pos, 255, 255, 0); // Bright yellow for Pacguy
 
-        // Set the red LED (Ghost)
-        led_updates[red_pos] = (red_pos, 255, 0, 0); // Bright red for the ghost
+        // Set the first Red LED (Ghost 1)
+        led_updates[red_pos_1] = (red_pos_1, 255, 0, 0); // Bright red for ghost 1
 
-        // Set the blue LED (Ghost)
-        led_updates[blue_pos] = (blue_pos, 0, 0, 255); // Bright blue for the ghost
+        // Set the second Red LED (Ghost 2)
+        led_updates[red_pos_2] = (red_pos_2, 255, 0, 0); // Bright red for ghost 2
+
+        // Set the first Blue LED (Ghost 1)
+        led_updates[blue_pos_1] = (blue_pos_1, 0, 0, 255); // Bright blue for ghost 1
+
+        // Set the second Blue LED (Ghost 2)
+        led_updates[blue_pos_2] = (blue_pos_2, 0, 0, 255); // Bright blue for ghost 2
 
         // Apply the updated LED states
         hd108.set_leds(&led_updates).await.unwrap();
@@ -103,7 +123,7 @@ async fn led_task(
     }
 
     println!("Pacguy animation complete...");
-
+    
     // Set all leds off
     hd108.set_off().await.unwrap();
 
