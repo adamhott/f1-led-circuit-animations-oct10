@@ -50,3 +50,7 @@ path = "bin/forward_reverse.rs"
 [[bin]]
 name = "strobe"
 path = "bin/strobe.rs"
+
+[[bin]]
+name = "rain"
+path = "bin/rain.rs"
