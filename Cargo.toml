@@ -54,3 +54,7 @@ path = "bin/strobe.rs"
 [[bin]]
 name = "rain"
 path = "bin/rain.rs"
+
+[[bin]]
+name = "pacguy"
+path = "bin/pacguy.rs"
